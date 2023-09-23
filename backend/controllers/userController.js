@@ -62,7 +62,7 @@ const registerUser = asyncHandler (async (req, res) => {
 // @desc: logout user
 // @route: POST /api/users/logout
 // @access: Private
-const logoutUser = asyncHandler (async (req, res) => {
+const logoutUser = asyncHandler(async (req, res) => {
     res.cookie("jwt", "", { // set the token cookie to expire in 0 seconds
         expires: new Date(Date.now() + 0),
         httpOnly: true
@@ -73,15 +73,38 @@ const logoutUser = asyncHandler (async (req, res) => {
 // @desc: Get user profile
 // @route: GET /api/users/profile
 // @access: Private - need a valid token
-const getUserProfile = asyncHandler (async (req, res) => {
-    res.status(200).json({message: "User profile"});
+const getUserProfile = asyncHandler(async (req, res) => {
+    const user = {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+    }
+
+    res.status(200).json(user);
 });
 
 // @desc: Update user profile
 // @route: PUT /api/users/profile
 // @access: Private - need a valid token
-const updateUserProfile = asyncHandler (async (req, res) => {
-    res.status(200).json({message: "User profile updated"});
+const updateUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id); // find the user by id
+
+    if (user) {
+        user.name = req.body.name || user.name; // if the name is provided, update the name
+        user.email = req.body.email || user.email; // if the email is provided, update the email
+        if (req.body.password) { // if the password is provided, update the password
+            user.password = req.body.password;
+        }
+
+        const updatedUser = await user.save(); // save the updated user
+
+
+        res.status(200).json({ // return the updated user data
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+        });
+    }
 });
 
 export {authUser, registerUser, logoutUser, getUserProfile, updateUserProfile};

@@ -11,7 +11,7 @@ const protect = asyncHandler(async (req, res, next) => { // protect the route
     if (token) { // if token exists
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET); // decode the token
-            req.user = await User.findById(decoded.id).select("-password"); // find the user by id and add the user data to the request object
+            req.user = await User.findById(decoded.userId).select("-password"); // find the user by id and add the user data to the request object
             next(); // move on to the next middleware
         } catch (error) {
             console.error(error);
