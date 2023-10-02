@@ -27,9 +27,9 @@ const LoginScreen = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
-            const res = await login({ email, password }).unwrap; // call the login mutation from the api slice (makes a request to the backend)
+            const res = await login({ email, password }).unwrap(); // call the login mutation from the api slice (makes a request to the backend)
             //unwrap will return a promise with the data if the request is successful and will unwrap the promise
-            dispatch(setCredentials(...res)); // set the credentials in the store
+            dispatch(setCredentials({ ...res })); // set the credentials in the store
             navigate('/');
         } catch (err) {
             toast.error(err?.data?.message || err.data.error);
@@ -59,6 +59,9 @@ const LoginScreen = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 /></Form.Group>
+
+            {isLoading && <h2>Loading...</h2>}
+
             <Button type="submit" variant="primary" className="mt-3">
                 Sign In
             </Button>
