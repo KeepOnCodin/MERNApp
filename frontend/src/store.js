@@ -7,7 +7,8 @@ const store = configureStore({
         auth: authReducer,
         [apiSlice.reducerPath]: apiSlice.reducer, // add the apiSlice reducer to the store
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware(), // Redux Toolkit's way of saying "don't touch this"
+    middleware: (getDefaultMiddleware) => 
+        getDefaultMiddleware().concat(apiSlice.middleware), // Redux Toolkit's way of saying "don't touch this"
     devTools: true,
 });
 

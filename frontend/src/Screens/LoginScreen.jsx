@@ -1,15 +1,39 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { Form, Button, Row, Col } from "react-bootstrap"
+import { useDispatch, useSelector } from "react-redux"
 import FormContainer from "../components/FormContainer"
+import { useLoginMutation } from "../slices/usersApiSlice"
+import { setCredentials } from "../slices/authSlice"
+import { toast } from "react-toastify"
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const [login, { isLoading }] = useLoginMutation(); // used to call the login mutation
+
+    const { userInfo } = useSelector(state => state.auth); // used to get the userInfo from the store
+
+    useEffect(() => {
+        if (userInfo) {
+            navigate('/');
+        }
+    }, [navigate, userInfo]);
+
     const submitHandler = async (e) => {
         e.preventDefault();
-        console.log('submit');
+        try {
+            const res = await login({ email, password }).unwrap; // call the login mutation from the api slice (makes a request to the backend)
+            //unwrap will return a promise with the data if the request is successful and will unwrap the promise
+            dispatch(setCredentials(...res)); // set the credentials in the store
+            navigate('/');
+        } catch (err) {
+            toast.error(err?.data?.message || err.data.error);
+        }
     }
 
   return (
